@@ -16,6 +16,21 @@
 #include "LinNm_ConfigTypes.h"
 
 /*====================================================================================================================*\
+    Defines
+\*====================================================================================================================*/
+
+/*[SWS_LinNm_00029]*/
+#define LINNM_E_NO_ERROR					0x00
+#define LINNM_E_UNINIT						0x01
+#define LINNM_E_INVALID_CHANNEL				0x02
+#define LINNM_E_PARAM_POINTER				0x12
+#define LINNM_E_INIT_FAILED					0x13
+#define LINNM_E_INVALID_PARAMETER			0x14
+
+#define LINNM_MODULE_ID						0x00
+#define LINNM_INSTANCE_ID					0x00
+
+/*====================================================================================================================*\
     Makra globalne
 \*====================================================================================================================*/
 
@@ -69,7 +84,7 @@ Std_ReturnType LinNm_Transmit(PduIdType TxPduId, const PduInfoType* PduInfoPtr);
 
 void LinNm_TxConfirmation(PduIdType TxPduId, Std_ReturnType result);
 
-
+void LinNm_MainFunction(void);
 
 
 /*====================================================================================================================*\
