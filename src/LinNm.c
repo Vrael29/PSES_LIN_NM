@@ -107,6 +107,8 @@ Std_ReturnType LinNm_PassiveStartUp(NetworkHandleType NetworkHandle) {
     }
     /*[SWS_LinNm_00006]*/
 
+    /* ----- Development Error Report -------------------------------- */
+
     return status;
 }
 
@@ -130,6 +132,7 @@ void LinNm_GetVersionInfo(Std_VersionInfoType* versioninfo) {
             argument versioninfo has null pointer then the service LinNm_GetVersionInfo() shall 
             report an error LINNM_E_PARAM_POINTER to Default Error Tracer and return 
             without any action*/
+            //Error code
         }
     }
 
@@ -138,6 +141,9 @@ void LinNm_GetVersionInfo(Std_VersionInfoType* versioninfo) {
     versioninfo->sw_major_version = LINNM_AR_RELEASE_MAJOR_VERSION;
     versioninfo->sw_minor_version = LINNM_AR_RELEASE_MINOR_VERSION;
     versioninfo->sw_patch_version = LINNM_AR_RELEASE_REVISION_VERSION;
+
+    /* ----- Development Error Report -------------------------------- */
+
 }
 
 Std_ReturnType LinNm_RequestBusSynchronization(NetworkHandleType nmChannelHandle) {
@@ -191,12 +197,32 @@ Std_ReturnType LinNm_GetNodeIdentifier(NetworkHandleType NetworkHandle, uint8* n
 }
 
 Std_ReturnType LinNm_GetLocalNodeIdentifier(NetworkHandleType NetworkHandle, uint8* nmNodeIdPtr) {
-    Std_ReturnType status = E_OK;
+    Std_ReturnType status = E_NOT_OK;
     return status;
 }
 
 Std_ReturnType LinNm_GetState(NetworkHandleType nmNetworkHandle, Nm_StateType* nmStatePtr, Nm_ModeType* nmModePtr) {
     Std_ReturnType status = E_OK;
+
+    if (LINNM_DEV_ERROR_DETECT == STD_ON) {
+        if (nmStatePtr == NULL && nmModePtr == NULL) {
+            /*[SWS_LinNm_00048] */
+            //Error code LINNM_E_PARAM_POINTER
+        }
+    }
+
+    if (LINNM_DEV_ERROR_DETECT == STD_ON) {
+        if (LinNm_Internal.InitStatus == NM_STATE_UNINIT){
+            /** [SWS_LinNm_00136] */
+            //Error code LINNM_E_UNINIT
+        }
+    }
+
+    *nmStatePtr = LinNm_Internal.LinNmChannels[nmNetworkHandle].State;
+    *nmModePtr  = LinNm_Internal.LinNmChannels[nmNetworkHandle].Mode;
+
+    /* ----- Development Error Report -------------------------------- */
+
     return status;
 }
 
