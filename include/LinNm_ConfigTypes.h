@@ -27,6 +27,13 @@
 
 #define LinNm_NumberOfLinNmChannels             1u
 
+#define LINNM_VENDOR_ID                         (30u)
+#define LINNM_MODULE_ID                         (63u)
+#define LINNM_AR_RELEASE_MAJOR_VERSION          (4u)
+#define LINNM_AR_RELEASE_MINOR_VERSION          (0u)
+#define LINNM_AR_RELEASE_REVISION_VERSION       (3u)
+
+
 typedef enum {
     LINNM_STATUS_UNINIT,
     LINNM_STATUS_INIT

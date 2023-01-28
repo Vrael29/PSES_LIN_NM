@@ -120,8 +120,24 @@ Std_ReturnType LinNm_NetworkRelease(NetworkHandleType nmChannelHandle) {
     return status;
 }
 
+/*[SWS_LinNm_00106]*/
 void LinNm_GetVersionInfo(Std_VersionInfoType* versioninfo) {
-    
+
+    if (LINNM_DEV_ERROR_DETECT == STD_ON) {
+        if (versioninfo == NULL) {
+            /*[SWS_LinNm_00163] */
+            /*If development error detection is enabled and the input 
+            argument versioninfo has null pointer then the service LinNm_GetVersionInfo() shall 
+            report an error LINNM_E_PARAM_POINTER to Default Error Tracer and return 
+            without any action*/
+        }
+    }
+
+    versioninfo->vendorID = LINNM_VENDOR_ID;
+    versioninfo->moduleID = LINNM_MODULE_ID;
+    versioninfo->sw_major_version = LINNM_AR_RELEASE_MAJOR_VERSION;
+    versioninfo->sw_minor_version = LINNM_AR_RELEASE_MINOR_VERSION;
+    versioninfo->sw_patch_version = LINNM_AR_RELEASE_REVISION_VERSION;
 }
 
 Std_ReturnType LinNm_RequestBusSynchronization(NetworkHandleType nmChannelHandle) {
