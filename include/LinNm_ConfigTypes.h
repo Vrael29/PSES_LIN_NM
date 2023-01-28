@@ -39,18 +39,17 @@ typedef struct {
 
 typedef struct
 {
+    LinNm_Internal_InitStatusType InitStatus;
+    LinNm_Internal_ChannelType LinNmChannels[LinNm_NumberOfLinNmChannels];
+} LinNm_InternalType;
+
+typedef struct
+{
     const uint32 LinNmTimeoutTime;
     const boolean LinNmNodeDetectionEnabled;
     const boolean LinNmNodeIdEnabled;
     const NetworkHandleType LinNmComMNetworkHandleRef;
 } LinNm_ChannelConfigType;
-
-typedef struct
-{
-    LinNm_Internal_InitStatusType InitStatus;
-    LinNm_Internal_ChannelType LinNmChannels[LinNm_NumberOfLinNmChannels];
-} LinNm_InternalType;
-
 
 typedef struct {
     const LinNm_ChannelConfigType* LinNmChannels[LinNm_NumberOfLinNmChannels];

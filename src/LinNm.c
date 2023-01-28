@@ -49,6 +49,7 @@ LinNm_InternalType LinNm_Internal = {
 \*====================================================================================================================*/
 /*[SWS_LinNm_00054]*/
 void LinNm_Init(const LinNm_ConfigType* ConfigPtr) {
+    const LinNm_ChannelConfigType* LinNmChannelsconf;
     LinNm_Internal_ChannelType* ChannelInternal;
     uint8_t channel;
 
@@ -68,16 +69,44 @@ void LinNm_Init(const LinNm_ConfigType* ConfigPtr) {
     }
 
     /*[SWS_LinNm_00102]*/
-    if (LINNM_STATE_CHANGE_IND_ENABLED == STD_ON){
+    if (LINNM_STATE_CHANGE_IND_ENABLED == STD_ON) {
         //No callouts shall be made from the init function, since it is not known if the other module is initialized
     }
 
-    LinNm_Internal = LINNM_STATUS_INIT;
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
 }
 
 /*[SWS_LinNm_00063]*/
 Std_ReturnType LinNm_PassiveStartUp(NetworkHandleType NetworkHandle) {
-    Std_ReturnType status = E_NOT_OK;
+    LinNm_Internal_ChannelType* ChannelInternal = &LinNm_Internal.LinNmChannels[NetworkHandle];
+   
+    Std_ReturnType status = E_OK;
+
+    /*[SWS_LinNm_00022]*/
+    if (ChannelInternal->Mode == NM_MODE_NETWORK) {
+        status = E_NOT_OK;
+    }
+
+
+    if (ChannelInternal->Mode == NM_MODE_BUS_SLEEP) {
+        /*[SWS_LinNm_00161]*/
+        ChannelInternal->Mode = NM_MODE_NETWORK;
+        /*[SWS_LinNm_00160]*/
+        ChannelInternal->State = NM_STATE_NORMAL_OPERATION;
+        Nm_BusSleepMode(NetworkHandle);
+        if (LINNM_REMOTE_SLEEP_INDICATION_ENABLED == STD_ON) {
+            Nm_RemoteSleepIndication(NetworkHandle);
+        }
+        /*[SWS_LinNm_00061]*/
+        if (LINNM_STATE_CHANGE_IND_ENABLED == STD_ON) {
+            Nm_StateChangeNotification(NetworkHandle, NM_STATE_BUS_SLEEP, NM_STATE_NORMAL_OPERATION);
+        }
+    } else {
+        /*[SWS_LinNm_00064]*/
+        status = E_NOT_OK;
+    }
+    /*[SWS_LinNm_00006]*/
+
     return status;
 }
 
