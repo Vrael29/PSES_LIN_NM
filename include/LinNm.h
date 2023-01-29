@@ -27,8 +27,28 @@
 #define LINNM_E_INIT_FAILED					0x13
 #define LINNM_E_INVALID_PARAMETER			0x14
 
-#define LINNM_MODULE_ID						0x00
 #define LINNM_INSTANCE_ID					0x00
+
+/* ----- API service IDs ----- */
+# define LINNM_SID_INIT_ID                          (0x00u) /*!< Service ID: LinNm_Init() */
+# define LINNM_SID_PASSIVESTARTUP                   (0x01u) /*!< Service ID: LinNm_PassiveStartUp() */
+# define LINNM_SID_NETWORKREQUEST                   (0x02u) /*!< Service ID: LinNm_NetworkRequest() */
+# define LINNM_SID_NETWORKRELEASE                   (0x03u) /*!< Service ID: LinNm_NetworkRelease() */
+# define LINNM_SID_DISABLECOMMUNICATION             (0x04u) /*!< Service ID: LinNm_DisableCommunication */
+# define LINNM_SID_ENABLECOMMUNICATION              (0x05u) /*!< Service ID: LinNm_EnableCommunication */
+# define LINNM_SID_SETUSERDATA                      (0x06u) /*!< Service ID: LinNm_SetUserData */
+# define LINNM_SID_GETUSERDATA                      (0x07u) /*!< Service ID: LinNm_GetUserData */
+# define LINNM_SID_GETPDUDATA                       (0x08u) /*!< Service ID: LinNm_GetPduData */
+# define LINNM_SID_REPEATMESSAGEREQUEST             (0x09u) /*!< Service ID: LinNm_RepeatMessageRequest */
+# define LINNM_SID_GETNODEIDENTIFIER                (0x0Au) /*!< Service ID: LinNm_GetNodeIdentifier */
+# define LINNM_SID_GETLOCALNODEIDENTIFIER           (0x0Bu) /*!< Service ID: LinNm_GetLocalNodeIdentifier */
+# define LINNM_SID_GETSTATE                         (0x0Eu) /*!< Service ID: LinNm_GetState */
+# define LINNM_SID_TRANSMIT                         (0x0Fu) /*!< Service ID: LinNm_Transmit */
+# define LINNM_SID_SETSLEEPREADYBIT                 (0x10u) /*!< Service ID: LinNm_SetSleepReadyBit */
+# define LINNM_SID_TXCONFIRMATION                   (0x40u) /*!< Service ID: LinNm_TxConfirmation */
+# define LINNM_SID_REQUESTBUSSYNCHRONIZATION        (0xC0u) /*!< Service ID: LinNm_RequestBusSynchronization */
+# define LINNM_SID_CHECKREMOTESLEEPIND              (0xD0u) /*!< Service ID: LinNm_CheckRemoteSleepIndication */
+# define LINNM_SID_GETVERSIONINFO                   (0xF1u) /*!< Service ID: LinNm_GetVersionInfo */
 
 /*====================================================================================================================*\
     Makra globalne

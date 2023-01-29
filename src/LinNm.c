@@ -13,6 +13,7 @@
 \*====================================================================================================================*/
 #include "./../include/LinNm.h"
 #include "./../include/LinNm_Cbk.h"
+#include "./../include/nm.h"
 
 /*====================================================================================================================*\
     Makra lokalne
@@ -155,7 +156,9 @@ Std_ReturnType LinNm_NetworkRequest(NetworkHandleType NetworkHandle) {
 		/*[SWS_LinNm_00006][SWS_LinNm_00008]*/
         Nm_NetworkMode(NetworkHandle);
 		/*[SWS_LinNm_00141]*/
-		Nm_RemoteSleepIndication(NetworkHandle);
+		if (LINNM_REMOTE_SLEEP_INDICATION_ENABLED == STD_ON) {
+            Nm_RemoteSleepIndication(NetworkHandle);
+        }
         /*[SWS_LinNm_00061]*/
         if (LINNM_STATE_CHANGE_IND_ENABLED == STD_ON) {
             Nm_StateChangeNotification(NetworkHandle, NM_STATE_BUS_SLEEP, NM_STATE_NORMAL_OPERATION);
