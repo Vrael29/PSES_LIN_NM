@@ -167,7 +167,6 @@ Std_ReturnType LinNm_NetworkRequest(NetworkHandleType NetworkHandle) {
 			return status;
 		}
 	}
-#endif
 
     if (ChannelInternal->Mode == NM_MODE_BUS_SLEEP) {
         /*[SWS_LinNm_00162]*/
@@ -191,6 +190,8 @@ Std_ReturnType LinNm_NetworkRequest(NetworkHandleType NetworkHandle) {
 
     return status;
 }
+#endif
+
 /*[SWS_LinNm_00159]*/
 #if (LINNM_PASSIVE_MODE_ENABLED == STD_OFF)
 /*[SWS_LinNm_00056]*/
