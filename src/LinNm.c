@@ -171,7 +171,7 @@ Std_ReturnType LinNm_NetworkRequest(NetworkHandleType NetworkHandle) {
 
     Std_ReturnType status = E_OK;
 
-    if (ChannelInternal->Mode == NM_MODE_BUS_SLEEP && LinNm_Internal.InitStatus == LINNM_STATUS_INIT) {
+    if (ChannelInternal->Mode == NM_MODE_BUS_SLEEP) {
         /*[SWS_LinNm_00162]*/
         ChannelInternal->Mode = NM_MODE_NETWORK;
         /*[SWS_LinNm_00015]*/
@@ -308,7 +308,7 @@ Std_ReturnType LinNm_RequestBusSynchronization(NetworkHandleType NetworkHandle) 
 /*[SWS_LinNm_00096]*/
 #if(LINNM_REMOTE_SLEEP_INDICATION_ENABLED == STD_ON)
 /*[SWS_LinNm_00092]*/
-Std_ReturnType LinNm_CheckRemoteSleepIndication(NetworkHandleType nmChannelHandle, boolean* nmRemoteSleepIndPtr) {
+Std_ReturnType LinNm_CheckRemoteSleepIndication(NetworkHandleType NetworkHandle, boolean* nmRemoteSleepIndPtr) {
     uint8_t error_code = LINNM_E_NO_ERROR;
 
     /*[SWS_LinNm_00034]*/
@@ -345,7 +345,7 @@ Std_ReturnType LinNm_CheckRemoteSleepIndication(NetworkHandleType nmChannelHandl
 /*[SWS_LinNm_00176][SWS_LinNm_00169]*/
 #if(LINNM_COORDINATOR_SYNC_SUPPORT == STD_ON)
 /*[SWS_LinNm_00175]*/
-Std_ReturnType LinNm_SetSleepReadyBit(NetworkHandleType nmChannelHandle, boolean nmSleepReadyBit) {
+Std_ReturnType LinNm_SetSleepReadyBit(NetworkHandleType NetworkHandle, boolean nmSleepReadyBit) {
     uint8_t error_code = LINNM_E_NO_ERROR;
 
     /*[SWS_LinNm_00034]*/
@@ -677,11 +677,6 @@ Std_ReturnType LinNm_Transmit(PduIdType TxPduId, const PduInfoType* PduInfoPtr) 
     /*[SWS_LinNm_00034]*/
     if (LINNM_DEV_ERROR_DETECT == STD_ON) {
         /*[SWS_LinNm_00029]*/
-        if (NetworkHandle > LinNm_NumberOfLinNmChannels || NetworkHandle < 0){
-			/*[SWS_LinNm_00038]*/
-			error_code |= LINNM_E_INVALID_CHANNEL;
-		}
-        /*[SWS_LinNm_00029]*/
         if (PduInfoPtr == NULL) {
             error_code |= LINNM_E_PARAM_POINTER;
         }
@@ -727,19 +722,3 @@ void LinNm_TxConfirmation(PduIdType TxPduId) {
 void LinNm_MainFunction(void){
 	
 }
-
-Nm_NetworkMode() {
-
-}
-
-Nm_BusSleepMode() {
-
-}
-
-Nm_StateChangeNotification() {
-
-}
-
-
-
-

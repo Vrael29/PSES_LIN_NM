@@ -9,22 +9,22 @@
 \*====================================================================================================================*/
 
 /* [SRS_BSW_00397] */
-#define LINNM_BUS_SYNCHRONIZATION_ENABLED       STD_OFF
-#define LINNM_COM_CONTROL_ENABLED               STD_OFF
-#define LINNM_COM_USER_DATA_SUPPORT             STD_OFF
-#define LINNM_COORDINATOR_SYNC_SUPPORT          STD_OFF
-#define LINNM_NODE_DETECTION_ENABLED            STD_OFF
-#define LINNM_NODE_ID_ENABLED                   STD_OFF
+#define LINNM_BUS_SYNCHRONIZATION_ENABLED       STD_ON
+#define LINNM_COM_CONTROL_ENABLED               STD_ON
+#define LINNM_COM_USER_DATA_SUPPORT             STD_ON
+#define LINNM_COORDINATOR_SYNC_SUPPORT          STD_ON
+#define LINNM_NODE_DETECTION_ENABLED            STD_ON
+#define LINNM_NODE_ID_ENABLED                   STD_ON
 #define LINNM_PASSIVE_MODE_ENABLED              STD_OFF
-#define LINNM_REMOTE_SLEEP_INDICATION_ENABLED   STD_OFF
-#define LINNM_STATE_CHANGE_IND_ENABLED          STD_OFF
+#define LINNM_REMOTE_SLEEP_INDICATION_ENABLED   STD_ON
+#define LINNM_STATE_CHANGE_IND_ENABLED          STD_ON
 /*[SWS_LinNm_00140]*/
 #define LINNM_SYNCHRONIZATIONPOINT_ENABLED      STD_OFF
-#define LINNM_USER_DATA_ENABLED                 STD_OFF
-#define LINNM_VERSION_INFO_API                  STD_OFF
+#define LINNM_USER_DATA_ENABLED                 STD_ON
+#define LINNM_VERSION_INFO_API                  STD_ON
 
-#define LINNM_DEV_ERROR_DETECT                  STD_OFF
-#define LINNM_DEV_ERROR_REPORT                  STD_OFF
+#define LINNM_DEV_ERROR_DETECT                  STD_ON
+#define LINNM_DEV_ERROR_REPORT                  STD_ON
 
 #define LinNm_NumberOfLinNmChannels             1u
 

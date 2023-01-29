@@ -6,8 +6,17 @@
 
 #include "./../include/acutest.h"
 #include "./../include/Std_Types.h"
+#include "./../include/fff.h"
 
 #include "LinNm.c"   
+
+DEFINE_FFF_GLOBALS;
+
+FAKE_VOID_FUNC(Det_ReportError, uint8_t, uint8_t, uint8_t, uint8_t);
+FAKE_VOID_FUNC(Nm_NetworkMode, NetworkHandleType);
+FAKE_VOID_FUNC(Nm_BusSleepMode, NetworkHandleType);
+FAKE_VOID_FUNC(Nm_RemoteSleepIndication, NetworkHandleType);
+FAKE_VOID_FUNC(Nm_StateChangeNotification, NetworkHandleType, Nm_StateType, Nm_StateType);
 
 /**
   @brief Test LinNm_Init
@@ -41,8 +50,19 @@ void Test_Of_LinNm_PassiveStartUp(void)
 */
 void Test_Of_LinNm_NetworkRequest(void)
 {
-    Std_ReturnType status = E_OK;
+    Std_ReturnType status;
     NetworkHandleType nmChannelHandle;
+    int Det_ReportError_ctr = 0;
+    int Nm_NetworkMode_ctr = 0;
+    int Nm_BusSleepMode_ctr = 0;
+    int Nm_RemoteSleepIndication_ctr = 0;
+    int Nm_StateChangeNotification_ctr = 0;
+
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    LinNm_Internal.LinNmChannels[nmChannelHandle].Mode = NM_MODE_BUS_SLEEP;
+    LinNm_Internal.LinNmChannels[nmChannelHandle].State = NM_STATE_BUS_SLEEP;
+
+    status = LinNm_NetworkRequest(nmChannelHandle);
 
     TEST_CHECK(status == E_OK);
 }
