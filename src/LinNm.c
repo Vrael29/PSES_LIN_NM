@@ -626,10 +626,9 @@ Std_ReturnType LinNm_GetLocalNodeIdentifier(NetworkHandleType NetworkHandle, uin
 }
 #endif
 
-Std_ReturnType LinNm_GetState(NetworkHandleType nmNetworkHandle, Nm_StateType* nmStatePtr, Nm_ModeType* nmModePtr) {
+Std_ReturnType LinNm_GetState(NetworkHandleType nmNetworkHandle, Nm_StateType *nmStatePtr, Nm_ModeType *nmModePtr) {
     Std_ReturnType status = E_OK;
     uint8_t error_code = LINNM_E_NO_ERROR;
-
     /*[SWS_LinNm_00034]*/
     if (LINNM_DEV_ERROR_DETECT == STD_ON) {
         /*[SWS_LinNm_00029]*/
@@ -640,7 +639,7 @@ Std_ReturnType LinNm_GetState(NetworkHandleType nmNetworkHandle, Nm_StateType* n
         /*[SWS_LinNm_00029]*/
         else if (nmNetworkHandle > LinNm_NumberOfLinNmChannels || nmNetworkHandle < 0){
 			/*[SWS_LinNm_00038]*/
-			error_code |= LINNM_E_INVALID_CHANNEL;
+			error_code = LINNM_E_INVALID_CHANNEL;
 			status = E_NOT_OK;
         }
         /*[SWS_LinNm_00025][SWS_LinNm_00136]*/
@@ -654,13 +653,13 @@ Std_ReturnType LinNm_GetState(NetworkHandleType nmNetworkHandle, Nm_StateType* n
     if (LINNM_DEV_ERROR_REPORT == STD_ON) {
         if (error_code != LINNM_E_NO_ERROR ){
             Det_ReportError(LINNM_MODULE_ID, LINNM_INSTANCE_ID, LINNM_SID_GETSTATE, error_code);
-	    return status;
+	        return status;
         }
     }
 
-    if(error_code == LINNM_E_NO_ERROR;){
-    	*nmStatePtr = LinNm_Internal.LinNmChannels[nmNetworkHandle].State;
-    	*nmModePtr  = LinNm_Internal.LinNmChannels[nmNetworkHandle].Mode;
+    if(error_code == LINNM_E_NO_ERROR){
+    	nmStatePtr = &LinNm_Internal.LinNmChannels[nmNetworkHandle].State;
+        nmModePtr  = &LinNm_Internal.LinNmChannels[nmNetworkHandle].Mode;
     }
     return status;
 }
