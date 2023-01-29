@@ -18,6 +18,7 @@
 #define LINNM_PASSIVE_MODE_ENABLED              STD_OFF
 #define LINNM_REMOTE_SLEEP_INDICATION_ENABLED   STD_OFF
 #define LINNM_STATE_CHANGE_IND_ENABLED          STD_OFF
+/*[SWS_LinNm_00140]*/
 #define LINNM_SYNCHRONIZATIONPOINT_ENABLED      STD_OFF
 #define LINNM_USER_DATA_ENABLED                 STD_OFF
 #define LINNM_VERSION_INFO_API                  STD_OFF
@@ -39,6 +40,8 @@ typedef enum {
     LINNM_STATUS_INIT
 }LinNm_Internal_InitStatusType;
 
+
+/*[SWS_LinNm_00005]*/
 typedef struct {
     Nm_ModeType Mode;
     Nm_StateType State;

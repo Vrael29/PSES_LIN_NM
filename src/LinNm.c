@@ -26,6 +26,7 @@
 /*====================================================================================================================*\
     Zmienne globalne
 \*====================================================================================================================*/
+/*[SWS_LinNm_00172]*/
 const LinNm_ConfigType* LinNm_ConfigPtr;
 
 /*[SWS_LinNm_00017]*/
@@ -81,8 +82,31 @@ void LinNm_Init(const LinNm_ConfigType* ConfigPtr) {
 /*[SWS_LinNm_00063]*/
 Std_ReturnType LinNm_PassiveStartUp(NetworkHandleType NetworkHandle) {
     LinNm_Internal_ChannelType* ChannelInternal = &LinNm_Internal.LinNmChannels[NetworkHandle];
-   
+    uint8_t error_code = LINNM_E_NO_ERROR;
     Std_ReturnType status = E_OK;
+
+    /*[SWS_LinNm_00034]*/
+    if (LINNM_DEV_ERROR_DETECT == STD_ON) {
+        /*[SWS_LinNm_00029]*/
+		if (NetworkHandle > LinNm_NumberOfLinNmChannels || NetworkHandle < 0){
+			/*[SWS_LinNm_00038]*/
+			error_code |= LINNM_E_INVALID_CHANNEL;
+			return E_NOT_OK;
+        /*[SWS_LinNm_00025]*/
+        /*[SWS_LinNm_00065]*/
+		} else if (LinNm_Internal.InitStatus == LINNM_STATUS_UNINIT) {
+            /*[SWS_LinNm_00037]*/
+            error_code |= LINNM_E_UNINIT;
+            return E_NOT_OK;
+        }
+        
+    }
+
+    if (LINNM_DEV_ERROR_REPORT == STD_ON){
+		if (error_code != LINNM_E_NO_ERROR){
+			Det_ReportError( LINNM_MODULE_ID, LINNM_INSTANCE_ID, LINNM_SID_NETWORKRELEASE, error_code);
+		}
+	}
 
     /*[SWS_LinNm_00022]*/
     if (ChannelInternal->Mode == NM_MODE_NETWORK) {
@@ -96,6 +120,7 @@ Std_ReturnType LinNm_PassiveStartUp(NetworkHandleType NetworkHandle) {
         /*[SWS_LinNm_00160]*/
         ChannelInternal->State = NM_STATE_NORMAL_OPERATION;
         Nm_NetworkMode(NetworkHandle);
+        /*[SWS_LinNm_00141] */
         if (LINNM_REMOTE_SLEEP_INDICATION_ENABLED == STD_ON) {
             Nm_RemoteSleepIndication(NetworkHandle);
         }
@@ -108,8 +133,6 @@ Std_ReturnType LinNm_PassiveStartUp(NetworkHandleType NetworkHandle) {
         status = E_NOT_OK;
     }
     /*[SWS_LinNm_00006]*/
-
-    /* ----- Development Error Report -------------------------------- */
 
     return status;
 }
@@ -226,17 +249,22 @@ Std_ReturnType LinNm_NetworkRelease(NetworkHandleType NetworkHandle) {
 
 /*[SWS_LinNm_00106]*/
 void LinNm_GetVersionInfo(Std_VersionInfoType* versioninfo) {
+    uint8_t error_code = LINNM_E_NO_ERROR;
 
+    /*[SWS_LinNm_00034]*/
     if (LINNM_DEV_ERROR_DETECT == STD_ON) {
+        /*[SWS_LinNm_00048]*/
         if (versioninfo == NULL) {
             /*[SWS_LinNm_00163] */
-            /*If development error detection is enabled and the input 
-            argument versioninfo has null pointer then the service LinNm_GetVersionInfo() shall 
-            report an error LINNM_E_PARAM_POINTER to Default Error Tracer and return 
-            without any action*/
-            //Error code
+            error_code |= LINNM_E_PARAM_POINTER;
         }
     }
+
+    if (LINNM_DEV_ERROR_REPORT == STD_ON) {
+        if (error_code != LINNM_E_NO_ERROR ){
+			Det_ReportError(LINNM_MODULE_ID, LINNM_INSTANCE_ID, LINNM_SID_NETWORKRELEASE, error_code);
+		}
+	}
 
     versioninfo->vendorID = LINNM_VENDOR_ID;
     versioninfo->moduleID = LINNM_MODULE_ID;
@@ -244,14 +272,35 @@ void LinNm_GetVersionInfo(Std_VersionInfoType* versioninfo) {
     versioninfo->sw_minor_version = LINNM_AR_RELEASE_MINOR_VERSION;
     versioninfo->sw_patch_version = LINNM_AR_RELEASE_REVISION_VERSION;
 
-    /* ----- Development Error Report -------------------------------- */
-
 }
 
+/*[SWS_LinNm_00091]*/
+#if (LINNM_PASSIVE_MODE_ENABLED == STD_OFF && LINNM_BUS_SYNCHRONIZATION_ENABLED == STD_ON)
+/*[SWS_LinNm_00089]*/
 Std_ReturnType LinNm_RequestBusSynchronization(NetworkHandleType nmChannelHandle) {
-    Std_ReturnType status = E_OK;
-    return status;
+    uint8_t error_code = LINNM_E_NO_ERROR;
+
+    /*[SWS_LinNm_00034]*/
+    if (LINNM_DEV_ERROR_DETECT == STD_ON) {
+        /*[SWS_LinNm_00025]*/
+        /*[SWS_LinNm_00090]*/
+        if (LinNm_Internal.InitStatus == LINNM_STATUS_UNINIT) {
+            /*[SWS_LinNm_00037]*/
+            error_code |= LINNM_E_UNINIT;
+        }
+    }
+
+    if (LINNM_DEV_ERROR_REPORT == STD_ON) {
+        if (error_code != LINNM_E_NO_ERROR ){
+            Det_ReportError(LINNM_MODULE_ID, LINNM_INSTANCE_ID, LINNM_SID_NETWORKRELEASE, error_code);
+        }
+    }
+
+    /*[SWS_LinNm_00042]*/
+    /*[SWS_LinNm_00095]*/
+    return E_OK;
 }
+#endif
 
 Std_ReturnType LinNm_CheckRemoteSleepIndication(NetworkHandleType nmChannelHandle, boolean* nmRemoteSleepIndPtr) {
     Std_ReturnType status = E_OK;
@@ -259,6 +308,7 @@ Std_ReturnType LinNm_CheckRemoteSleepIndication(NetworkHandleType nmChannelHandl
 }
 
 Std_ReturnType LinNm_SetSleepReadyBit(NetworkHandleType nmChannelHandle, boolean nmSleepReadyBit) {
+    /*[SWS_LinNm_00169] */
     Std_ReturnType status = E_OK;
     return status;
 }
@@ -305,18 +355,34 @@ Std_ReturnType LinNm_GetLocalNodeIdentifier(NetworkHandleType NetworkHandle, uin
 
 Std_ReturnType LinNm_GetState(NetworkHandleType nmNetworkHandle, Nm_StateType* nmStatePtr, Nm_ModeType* nmModePtr) {
     Std_ReturnType status = E_OK;
+    uint8_t error_code = LINNM_E_NO_ERROR;
 
+    /*[SWS_LinNm_00034]*/
     if (LINNM_DEV_ERROR_DETECT == STD_ON) {
         if (nmStatePtr == NULL && nmModePtr == NULL) {
-            /*[SWS_LinNm_00048] */
-            //Error code LINNM_E_PARAM_POINTER
+            /*[SWS_LinNm_00048]*/
+            error_code |= LINNM_E_PARAM_POINTER;
+            return E_NOT_OK;
+        /*[SWS_LinNm_00029]*/
+        } else if (nmNetworkHandle > LinNm_NumberOfLinNmChannels || nmNetworkHandle < 0){
+			/*[SWS_LinNm_00038]*/
+			error_code |= LINNM_E_INVALID_CHANNEL;
+			return E_NOT_OK;
         }
     }
 
     if (LINNM_DEV_ERROR_DETECT == STD_ON) {
-        if (LinNm_Internal.InitStatus == NM_STATE_UNINIT){
-            /** [SWS_LinNm_00136] */
-            //Error code LINNM_E_UNINIT
+        if (LinNm_Internal.InitStatus == LINNM_STATUS_UNINIT) {
+            /*[SWS_LinNm_00037]*/
+            /*[SWS_LinNm_00136]*/
+            error_code |= LINNM_E_UNINIT;
+            return E_NOT_OK;
+        }
+    }
+
+    if (LINNM_DEV_ERROR_REPORT == STD_ON) {
+        if (error_code != LINNM_E_NO_ERROR ){
+            Det_ReportError(LINNM_MODULE_ID, LINNM_INSTANCE_ID, LINNM_SID_NETWORKRELEASE, error_code);
         }
     }
 
