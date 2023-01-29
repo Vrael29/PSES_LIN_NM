@@ -102,7 +102,7 @@ Std_ReturnType LinNm_GetState(NetworkHandleType nmNetworkHandle, Nm_StateType* n
 
 Std_ReturnType LinNm_Transmit(PduIdType TxPduId, const PduInfoType* PduInfoPtr);
 
-void LinNm_TxConfirmation(PduIdType TxPduId, Std_ReturnType result);
+void LinNm_TxConfirmation(PduIdType TxPduId);
 
 void LinNm_MainFunction(void);
 
