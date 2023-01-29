@@ -37,10 +37,86 @@ void Test_Of_LinNm_Init(void)
 */
 void Test_Of_LinNm_PassiveStartUp(void)
 {
-    Std_ReturnType status = E_OK;
+    Std_ReturnType status;
+    NetworkHandleType nmChannelHandle = 0;
+    int Det_ReportError_ctr = 0;
+    int Nm_NetworkMode_ctr = 0;
+    int Nm_BusSleepMode_ctr = 0;
+    int Nm_RemoteSleepIndication_ctr = 0;
+    int Nm_StateChangeNotification_ctr = 0;
+
+    //Test1 Function changes mode correctly
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+    LinNm_Internal.LinNmChannels[nmChannelHandle].Mode = NM_MODE_BUS_SLEEP;
+    LinNm_Internal.LinNmChannels[nmChannelHandle].State = NM_STATE_BUS_SLEEP;
+
+    status = LinNm_PassiveStartUp(nmChannelHandle);
+    Nm_NetworkMode_ctr++;
+    Nm_RemoteSleepIndication_ctr++;
+    Nm_StateChangeNotification_ctr++;
     // NetworkHandleType NetworkHandle;
     // status = LinNm_PassiveStartUp(NetworkHandle);
     TEST_CHECK(status == E_OK);
+    TEST_CHECK(LinNm_Internal.LinNmChannels[nmChannelHandle].Mode == NM_MODE_NETWORK);
+    TEST_CHECK(LinNm_Internal.LinNmChannels[nmChannelHandle].State = NM_STATE_NORMAL_OPERATION);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Nm_NetworkMode_fake.call_count == Nm_NetworkMode_ctr);
+    TEST_CHECK(Nm_BusSleepMode_fake.call_count == Nm_BusSleepMode_ctr);
+    TEST_CHECK(Nm_RemoteSleepIndication_fake.call_count == Nm_RemoteSleepIndication_ctr);
+    TEST_CHECK(Nm_StateChangeNotification_fake.call_count == Nm_StateChangeNotification_ctr);
+    TEST_CHECK(Nm_StateChangeNotification_fake.arg1_val == NM_STATE_BUS_SLEEP);
+    TEST_CHECK(Nm_StateChangeNotification_fake.arg2_val == NM_STATE_NORMAL_OPERATION);
+
+    //Test2 Function called in wrong mode
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+    LinNm_Internal.LinNmChannels[nmChannelHandle].Mode = NM_MODE_NETWORK;
+    LinNm_Internal.LinNmChannels[nmChannelHandle].State = NM_STATE_NORMAL_OPERATION;
+
+    status = LinNm_PassiveStartUp(nmChannelHandle);
+
+    TEST_CHECK(status == E_NOT_OK);
+    TEST_CHECK(LinNm_Internal.LinNmChannels[nmChannelHandle].Mode == NM_MODE_NETWORK);
+    TEST_CHECK(LinNm_Internal.LinNmChannels[nmChannelHandle].State = NM_STATE_NORMAL_OPERATION);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Nm_NetworkMode_fake.call_count == Nm_NetworkMode_ctr);
+    TEST_CHECK(Nm_BusSleepMode_fake.call_count == Nm_BusSleepMode_ctr);
+    TEST_CHECK(Nm_RemoteSleepIndication_fake.call_count == Nm_RemoteSleepIndication_ctr);
+    TEST_CHECK(Nm_StateChangeNotification_fake.call_count == Nm_StateChangeNotification_ctr);
+
+    // //Test3 Function called while module not initialized
+    LinNm_Internal.InitStatus = LINNM_STATUS_UNINIT;
+    nmChannelHandle = 0;
+    LinNm_Internal.LinNmChannels[nmChannelHandle].Mode = NM_MODE_BUS_SLEEP;
+    LinNm_Internal.LinNmChannels[nmChannelHandle].State = NM_STATE_BUS_SLEEP;
+
+    status = LinNm_PassiveStartUp(nmChannelHandle);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_NOT_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Nm_NetworkMode_fake.call_count == Nm_NetworkMode_ctr);
+    TEST_CHECK(Nm_BusSleepMode_fake.call_count == Nm_BusSleepMode_ctr);
+    TEST_CHECK(Nm_RemoteSleepIndication_fake.call_count == Nm_RemoteSleepIndication_ctr);
+    TEST_CHECK(Nm_StateChangeNotification_fake.call_count == Nm_StateChangeNotification_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_UNINIT);
+
+    // //Test4 Function called with invalid channel
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = -1;
+
+    status = LinNm_PassiveStartUp(nmChannelHandle);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_NOT_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Nm_NetworkMode_fake.call_count == Nm_NetworkMode_ctr);
+    TEST_CHECK(Nm_BusSleepMode_fake.call_count == Nm_BusSleepMode_ctr);
+    TEST_CHECK(Nm_RemoteSleepIndication_fake.call_count == Nm_RemoteSleepIndication_ctr);
+    TEST_CHECK(Nm_StateChangeNotification_fake.call_count == Nm_StateChangeNotification_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_INVALID_CHANNEL);
+
 }
 
 /**
@@ -258,9 +334,26 @@ void Test_Of_LinNm_NetworkRelease(void)
 */
 void Test_Of_LinNm_GetVersionInfo(void)
 {
-    Std_VersionInfoType* versioninfo;
+    int Det_ReportError_ctr = 0;
+    const Std_VersionInfoType* version;
 
-    // TEST_CHECK(status == E_OK);
+    //Test1 Function changes mode correctly
+
+    LinNm_GetVersionInfo(version);
+
+    TEST_CHECK(version->vendorID == LINNM_VENDOR_ID);
+    TEST_CHECK(version->moduleID == LINNM_MODULE_ID);
+    TEST_CHECK(version->sw_major_version == LINNM_AR_RELEASE_MAJOR_VERSION);
+    TEST_CHECK(version->sw_minor_version == LINNM_AR_RELEASE_MINOR_VERSION);
+    TEST_CHECK(version->sw_patch_version == LINNM_AR_RELEASE_REVISION_VERSION);
+
+    //Test2 Function called in wrong mode
+    version = NULL;
+    LinNm_GetVersionInfo(version);
+    Det_ReportError_ctr++;
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_PARAM_POINTER);
+
 }
 
 /**
@@ -420,12 +513,54 @@ void Test_Of_LinNm_GetLocalNodeIdentifier(void)
 */
 void Test_Of_LinNm_GetState(void)
 {
-    Std_ReturnType status = E_OK;
-    NetworkHandleType NetworkHandle;
+    Std_ReturnType status;
+    NetworkHandleType nmChannelHandle = 0;
     Nm_StateType* nmStatePtr;
     Nm_ModeType* nmModePtr;
-    
-    TEST_CHECK(status == E_OK);
+    int Det_ReportError_ctr = 0;
+
+    //Test1 Function changes mode correctly
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    LinNm_Internal.LinNmChannels[nmChannelHandle].Mode = NM_MODE_BUS_SLEEP;
+    LinNm_Internal.LinNmChannels[nmChannelHandle].State = NM_STATE_BUS_SLEEP;
+    status = LinNm_GetState(nmChannelHandle, nmStatePtr, nmModePtr);
+
+    TEST_CHECK(status = E_OK);
+    TEST_CHECK(nmStatePtr == NM_STATE_BUS_SLEEP);
+    TEST_CHECK(nmModePtr == NM_MODE_BUS_SLEEP);
+
+    //Test2 Function called with wrong channel
+    nmChannelHandle = -1;
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    status = LinNm_GetState(nmChannelHandle, nmStatePtr, nmModePtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status = E_NOT_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_INVALID_CHANNEL);
+
+    //Test3 Function called with unitiliazed LinNm
+    nmChannelHandle = 0;
+    LinNm_Internal.InitStatus = LINNM_STATUS_UNINIT;
+    status = LinNm_GetState(nmChannelHandle, nmStatePtr, nmModePtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status = E_NOT_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_UNINIT);
+
+    //Test4 Function called with null pointer
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmModePtr = NULL;
+    nmStatePtr = NULL;
+    status = LinNm_GetState(nmChannelHandle, nmStatePtr, nmModePtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status = E_OK);
+    TEST_CHECK(nmStatePtr == NULL);
+    TEST_CHECK(nmModePtr == NULL);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_PARAM_POINTER);
 }
 
 /**
