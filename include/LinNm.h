@@ -104,7 +104,7 @@ Std_ReturnType LinNm_Transmit(PduIdType TxPduId, const PduInfoType* PduInfoPtr);
 
 void LinNm_TxConfirmation(PduIdType TxPduId);
 
-void LinNm_MainFunction(void);
+//void LinNm_MainFunction(void);
 
 
 /*====================================================================================================================*\

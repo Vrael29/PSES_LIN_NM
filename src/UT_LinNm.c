@@ -21,19 +21,37 @@ FAKE_VOID_FUNC(Nm_StateChangeNotification, NetworkHandleType, Nm_StateType, Nm_S
 /**
   @brief Test LinNm_Init
 
-  Funkcja testująca  #TODO
+  Funkcja testująca LinNm_Init
 */
 void Test_Of_LinNm_Init(void)
 {
+    int Det_ReportError_ctr = 1;
     const LinNm_ConfigType* ConfigPtr;
-    // TEST_CHECK();
 
+    //Test1 Correct initialization
+    LinNm_Init(ConfigPtr);
+
+    for (int channel = 0; channel < LinNm_NumberOfLinNmChannels; channel++) {
+        TEST_CHECK(LinNm_Internal.LinNmChannels[channel].Mode == NM_MODE_BUS_SLEEP);
+        TEST_CHECK(LinNm_Internal.LinNmChannels[channel].State == NM_STATE_BUS_SLEEP);
+    }
+    TEST_CHECK(LinNm_Internal.InitStatus == LINNM_STATUS_INIT);
+
+    //Test2 Null param pointer Error
+    const LinNm_ConfigType* ConfigPtr_null;
+    ConfigPtr_null = NULL;
+
+    LinNm_Init(ConfigPtr_null);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_PARAM_POINTER);
 }
 
 /**
   @brief Test LinNm_PassiveStartUp
 
-  Funkcja testująca #TODO
+  Funkcja testująca LinNm_PassiveStartUp
 */
 void Test_Of_LinNm_PassiveStartUp(void)
 {
@@ -330,7 +348,7 @@ void Test_Of_LinNm_NetworkRelease(void)
 /**
   @brief Test LinNm_GetVersionInfo
 
-  Funkcja testująca #TODO
+  Funkcja testująca LinNm_GetVersionInfo
 */
 void Test_Of_LinNm_GetVersionInfo(void)
 {
@@ -359,157 +377,578 @@ void Test_Of_LinNm_GetVersionInfo(void)
 /**
   @brief Test LinNm_RequestBusSynchronization
 
-  Funkcja testująca #TODO
+  Funkcja testująca LinNm_RequestBusSynchronization
 */
 void Test_Of_LinNm_RequestBusSynchronization(void)
 {
-    Std_ReturnType status = E_OK;
     NetworkHandleType nmChannelHandle;
+    Std_ReturnType status;
+    int Det_ReportError_ctr = 0;
+
+    //Test1 No Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+
+    status = LinNm_RequestBusSynchronization(nmChannelHandle);
 
     TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+
+    //Test2 Uninit Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_UNINIT;
+    nmChannelHandle = 0;
+
+    status = LinNm_RequestBusSynchronization(nmChannelHandle);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_UNINIT);
+
+    //Test3 Invalid channel Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = -1;
+
+    status = LinNm_RequestBusSynchronization(nmChannelHandle);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_INVALID_CHANNEL);
 }
 
 /**
   @brief Test LinNm_CheckRemoteSleepIndication
 
-  Funkcja testująca #TODO
+  Funkcja testująca LinNm_CheckRemoteSleepIndication
 */
 void Test_Of_LinNm_CheckRemoteSleepIndication(void)
 {
-    Std_ReturnType status = E_OK;
+    Std_ReturnType status;
     NetworkHandleType nmChannelHandle;
     boolean* nmRemoteSleepIndPtr;
+    int Det_ReportError_ctr = 0;
+
+    //Test1 No Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+    *nmRemoteSleepIndPtr = 1;
+
+    status = LinNm_CheckRemoteSleepIndication(nmChannelHandle, nmRemoteSleepIndPtr);
 
     TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+
+    //Test2 Uninit Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_UNINIT;
+    nmChannelHandle = 0;
+    *nmRemoteSleepIndPtr = 1;
+
+    status = LinNm_CheckRemoteSleepIndication(nmChannelHandle, nmRemoteSleepIndPtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_UNINIT);
+
+    //Test3 Invalid channel Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = -1;
+    *nmRemoteSleepIndPtr = 1;
+
+    status = LinNm_CheckRemoteSleepIndication(nmChannelHandle, nmRemoteSleepIndPtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_INVALID_CHANNEL);
+
+    //Test4 Null param pointer Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+    nmRemoteSleepIndPtr = NULL;
+
+    status = LinNm_CheckRemoteSleepIndication(nmChannelHandle, nmRemoteSleepIndPtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_PARAM_POINTER);
 }
 
 /**
   @brief Test LinNm_SetSleepReadyBit
 
-  Funkcja testująca #TODO
+  Funkcja testująca LinNm_SetSleepReadyBit
 */
 void Test_Of_LinNm_SetSleepReadyBit(void)
 {
-    Std_ReturnType status = E_OK;
     NetworkHandleType nmChannelHandle;
     boolean nmSleepReadyBit;
-    
+    Std_ReturnType status;
+    int Det_ReportError_ctr = 0;
+
+    //Test1 No Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+    nmSleepReadyBit = 1;
+
+    status = LinNm_SetSleepReadyBit(nmChannelHandle, nmSleepReadyBit);
+
     TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+
+    //Test2 Uninit Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_UNINIT;
+    nmChannelHandle = 0;
+    nmSleepReadyBit = 1;
+
+    status = LinNm_SetSleepReadyBit(nmChannelHandle, nmSleepReadyBit);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_UNINIT);
+
+    //Test3 Invalid channel Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = -1;
+    nmSleepReadyBit = 1;
+
+    status = LinNm_SetSleepReadyBit(nmChannelHandle, nmSleepReadyBit);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_INVALID_CHANNEL);
 }
 
 /**
   @brief Test LinNm_DisableCommunication
 
-  Funkcja testująca #TODO
+  Funkcja testująca LinNm_DisableCommunication
 */
 void Test_Of_LinNm_DisableCommunication(void)
 {
-    Std_ReturnType status = E_OK;
-    NetworkHandleType NetworkHandle;
-    
+    NetworkHandleType nmChannelHandle;
+    Std_ReturnType status;
+    int Det_ReportError_ctr = 0;
+
+    //Test1 No Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+
+    status = LinNm_DisableCommunication(nmChannelHandle);
+
     TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+
+    //Test2 Uninit Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_UNINIT;
+    nmChannelHandle = 0;
+
+    status = LinNm_DisableCommunication(nmChannelHandle);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_UNINIT);
+
+    //Test3 Invalid channel Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = -1;
+
+    status = LinNm_DisableCommunication(nmChannelHandle);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_INVALID_CHANNEL);
 }
 
 /**
   @brief Test LinNm_EnableCommunication
 
-  Funkcja testująca #TODO
+  Funkcja testująca LinNm_EnableCommunication
 */
 void Test_Of_LinNm_EnableCommunication(void)
 {
-    Std_ReturnType status = E_OK;
-    NetworkHandleType NetworkHandle;
-    
+    NetworkHandleType nmChannelHandle;
+    Std_ReturnType status;
+    int Det_ReportError_ctr = 0;
+
+    //Test1 No Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+
+    status = LinNm_EnableCommunication(nmChannelHandle);
+
     TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+
+    //Test2 Uninit Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_UNINIT;
+    nmChannelHandle = 0;
+
+    status = LinNm_EnableCommunication(nmChannelHandle);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_UNINIT);
+
+    //Test3 Invalid channel Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = -1;
+
+    status = LinNm_EnableCommunication(nmChannelHandle);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_INVALID_CHANNEL);
 }
 
 /**
   @brief Test LinNm_SetUserData
 
-  Funkcja testująca #TODO
+  Funkcja testująca LinNm_SetUserData
 */
 void Test_Of_LinNm_SetUserData(void)
 {
-    Std_ReturnType status = E_OK;
-    NetworkHandleType NetworkHandle;
-    const uint8* nmUserDataPtr;
-    
+    Std_ReturnType status;
+    NetworkHandleType nmChannelHandle;
+    const uint8* nmUserDataPtr = 1;
+    int Det_ReportError_ctr = 0;
+
+    //Test1 No Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+
+    status = LinNm_SetUserData(nmChannelHandle, nmUserDataPtr);
+
     TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+
+    //Test2 Uninit Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_UNINIT;
+    nmChannelHandle = 0;
+
+    status = LinNm_SetUserData(nmChannelHandle, nmUserDataPtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_UNINIT);
+
+    //Test3 Invalid channel Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = -1;
+
+    status = LinNm_SetUserData(nmChannelHandle, nmUserDataPtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_INVALID_CHANNEL);
+
+    //Test4 Null param pointer Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+    const uint8* nmUserDataPtr_null;
+    nmUserDataPtr_null = NULL;
+
+    status = LinNm_SetUserData(nmChannelHandle, nmUserDataPtr_null);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_PARAM_POINTER);
 }
 
 /**
   @brief Test LinNm_GetUserData
 
-  Funkcja testująca #TODO
+  Funkcja testująca LinNm_GetUserData
 */
 void Test_Of_LinNm_GetUserData(void)
 {
-    Std_ReturnType status = E_OK;
-    NetworkHandleType NetworkHandle;
+    Std_ReturnType status;
+    NetworkHandleType nmChannelHandle;
     uint8* nmUserDataPtr;
-    
+    int Det_ReportError_ctr = 0;
+
+    //Test1 No Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+    *nmUserDataPtr = 1;
+
+    status = LinNm_GetUserData(nmChannelHandle, nmUserDataPtr);
+
     TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+
+    //Test2 Uninit Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_UNINIT;
+    nmChannelHandle = 0;
+    *nmUserDataPtr = 1;
+
+    status = LinNm_GetUserData(nmChannelHandle, nmUserDataPtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_UNINIT);
+
+    //Test3 Invalid channel Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = -1;
+    *nmUserDataPtr = 1;
+
+    status = LinNm_GetUserData(nmChannelHandle, nmUserDataPtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_INVALID_CHANNEL);
+
+    //Test4 Null param pointer Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+    nmUserDataPtr = NULL;
+
+    status = LinNm_GetUserData(nmChannelHandle, nmUserDataPtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_PARAM_POINTER);
 }
 
 /**
   @brief Test LinNm_GetPduData
 
-  Funkcja testująca #TODO
+  Funkcja testująca LinNm_GetPduData
 */
 void Test_Of_LinNm_GetPduData(void)
 {
-    Std_ReturnType status = E_OK;
-    NetworkHandleType NetworkHandle;
+    Std_ReturnType status;
+    NetworkHandleType nmChannelHandle;
     uint8* nmPduData;
-    
+    int Det_ReportError_ctr = 0;
+
+    //Test1 No Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+    *nmPduData = 1;
+
+    status = LinNm_GetPduData(nmChannelHandle, nmPduData);
+
     TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+
+    //Test2 Uninit Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_UNINIT;
+    nmChannelHandle = 0;
+    *nmPduData = 1;
+
+    status = LinNm_GetPduData(nmChannelHandle, nmPduData);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_UNINIT);
+
+    //Test3 Invalid channel Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = -1;
+    *nmPduData = 1;
+
+    status = LinNm_GetPduData(nmChannelHandle, nmPduData);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_INVALID_CHANNEL);
+
+    //Test4 Null param pointer Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+    nmPduData = NULL;
+
+    status = LinNm_GetPduData(nmChannelHandle, nmPduData);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_PARAM_POINTER);
 }
 
 /**
   @brief Test LinNm_RepeatMessageRequest
 
-  Funkcja testująca #TODO
+  Funkcja testująca LinNm_RepeatMessageRequest
 */
 void Test_Of_LinNm_RepeatMessageRequest(void)
 {
-    Std_ReturnType status = E_OK;
-    NetworkHandleType NetworkHandle;
-    
+    Std_ReturnType status;
+    NetworkHandleType nmChannelHandle;
+    int Det_ReportError_ctr = 0;
+
+    //Test1 No Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+
+    status = LinNm_RepeatMessageRequest(nmChannelHandle);
+
     TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+
+    //Test2 Uninit Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_UNINIT;
+    nmChannelHandle = 0;
+
+    status = LinNm_RepeatMessageRequest(nmChannelHandle);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_UNINIT);
+
+    //Test3 Invalid channel Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = -1;
+
+    status = LinNm_RepeatMessageRequest(nmChannelHandle);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_INVALID_CHANNEL);
 }
 
 /**
   @brief Test LinNm_GetNodeIdentifier
 
-  Funkcja testująca #TODO
+  Funkcja testująca LinNm_GetNodeIdentifier
 */
 void Test_Of_LinNm_GetNodeIdentifier(void)
 {
-    Std_ReturnType status = E_OK;
-    NetworkHandleType NetworkHandle;
+    Std_ReturnType status;
+    NetworkHandleType nmChannelHandle;
     uint8* nmNodeIdPtr;
-    
+    int Det_ReportError_ctr = 0;
+
+    //Test1 No Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+    *nmNodeIdPtr = 1;
+
+    status = LinNm_GetNodeIdentifier(nmChannelHandle, nmNodeIdPtr);
+
     TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+
+    //Test2 Uninit Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_UNINIT;
+    nmChannelHandle = 0;
+    *nmNodeIdPtr = 1;
+
+    status = LinNm_GetNodeIdentifier(nmChannelHandle, nmNodeIdPtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_UNINIT);
+
+    //Test3 Invalid channel Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = -1;
+    *nmNodeIdPtr = 1;
+
+    status = LinNm_GetNodeIdentifier(nmChannelHandle, nmNodeIdPtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_INVALID_CHANNEL);
+
+    //Test4 Null param pointer Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+    nmNodeIdPtr = NULL;
+
+    status = LinNm_GetNodeIdentifier(nmChannelHandle, nmNodeIdPtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_PARAM_POINTER);
 }
 
 /**
   @brief Test LinNm_GetLocalNodeIdentifier
 
-  Funkcja testująca #TODO
+  Funkcja testująca LinNm_GetLocalNodeIdentifier
 */
 void Test_Of_LinNm_GetLocalNodeIdentifier(void)
 {
-    Std_ReturnType status = E_OK;
-    NetworkHandleType NetworkHandle;
+    Std_ReturnType status;
+    NetworkHandleType nmChannelHandle;
     uint8* nmNodeIdPtr;
-    
+    int Det_ReportError_ctr = 0;
+
+    //Test1 No Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+    *nmNodeIdPtr = 1;
+
+    status = LinNm_GetLocalNodeIdentifier(nmChannelHandle, nmNodeIdPtr);
+
     TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+
+    //Test2 Uninit Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_UNINIT;
+    nmChannelHandle = 0;
+    *nmNodeIdPtr = 1;
+
+    status = LinNm_GetLocalNodeIdentifier(nmChannelHandle, nmNodeIdPtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_UNINIT);
+
+    //Test3 Invalid channel Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = -1;
+    *nmNodeIdPtr = 1;
+
+    status = LinNm_GetLocalNodeIdentifier(nmChannelHandle, nmNodeIdPtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_INVALID_CHANNEL);
+
+    //Test4 Null param pointer Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    nmChannelHandle = 0;
+    nmNodeIdPtr = NULL;
+
+    status = LinNm_GetLocalNodeIdentifier(nmChannelHandle, nmNodeIdPtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_PARAM_POINTER);
 }
 
 /**
   @brief Test LinNm_GetState
 
-  Funkcja testująca #TODO
+  Funkcja testująca LinNm_GetState
 */
 void Test_Of_LinNm_GetState(void)
 {
@@ -565,28 +1004,76 @@ void Test_Of_LinNm_GetState(void)
 /**
   @brief Test LinNm_Transmit
 
-  Funkcja testująca #TODO
+  Funkcja testująca LinNm_Transmit
 */
 void Test_Of_LinNm_Transmit(void)
 {
-    Std_ReturnType status = E_OK;
+    Std_ReturnType status;
     PduIdType TxPduId;
-    const PduInfoType* PduInfoPtr;
-    
-    TEST_CHECK(status == E_OK);
+    const PduInfoType* PduInfoPtr = 1;
+    int Det_ReportError_ctr = 0;
+
+    //Test1 No Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    TxPduId = 0;
+
+    status = LinNm_Transmit(TxPduId, PduInfoPtr);
+
+    TEST_CHECK(status == E_NOT_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+
+    //Test2 Uninit Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_UNINIT;
+    TxPduId = 0;
+
+    status = LinNm_Transmit(TxPduId, PduInfoPtr);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_NOT_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_UNINIT);
+
+    //Test3 Null param pointer Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    TxPduId = 0;
+    const PduInfoType* PduInfoPtr_null;
+    PduInfoPtr_null = NULL;
+
+    status = LinNm_Transmit(TxPduId, PduInfoPtr_null);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(status == E_NOT_OK);
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_PARAM_POINTER);
 }
 
 /**
   @brief Test LinNm_TxConfirmation
 
-  Funkcja testująca #TODO
+  Funkcja testująca LinNm_TxConfirmation
 */
 void Test_Of_LinNm_TxConfirmation(void)
 {
     PduIdType TxPduId;
-    Std_ReturnType result;
-    
-    // TEST_CHECK(status == E_OK);
+    int Det_ReportError_ctr = 0;
+
+    //Test1 No Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_INIT;
+    TxPduId = 0;
+
+    LinNm_TxConfirmation(TxPduId);
+
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+
+    //Test2 Uninit Error
+    LinNm_Internal.InitStatus = LINNM_STATUS_UNINIT;
+    TxPduId = 0;
+
+    LinNm_TxConfirmation(TxPduId);
+    Det_ReportError_ctr++;
+
+    TEST_CHECK(Det_ReportError_fake.call_count == Det_ReportError_ctr);
+    TEST_CHECK(Det_ReportError_fake.arg3_val == LINNM_E_UNINIT);
 }
 
 /*

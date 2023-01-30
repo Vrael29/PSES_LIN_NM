@@ -54,14 +54,27 @@ void LinNm_Init(const LinNm_ConfigType* ConfigPtr) {
     const LinNm_ChannelConfigType* LinNmChannelsconf;
     LinNm_Internal_ChannelType* ChannelInternal;
     uint8_t channel;
-	uint8_t error_code = 0;
+    uint8_t error_code = LINNM_E_NO_ERROR;
+
+    /*[SWS_LinNm_00034]*/
+    if (LINNM_DEV_ERROR_DETECT == STD_ON) {
+        /*[SWS_LinNm_00029]*/
+        if (ConfigPtr == NULL) {
+            error_code |= LINNM_E_PARAM_POINTER;
+        }
+    }
+
+    if (LINNM_DEV_ERROR_REPORT == STD_ON) {
+        if (error_code != LINNM_E_NO_ERROR) {
+            Det_ReportError(LINNM_MODULE_ID, LINNM_INSTANCE_ID, LINNM_SID_INIT_ID, error_code);
+        }
+    }
 
     for (channel = 0; channel < LinNm_NumberOfLinNmChannels; channel++) {
         ChannelInternal = &LinNm_Internal.LinNmChannels[channel];
         /*[SWS_LinNm_00017]*/
         ChannelInternal->State = NM_STATE_UNINIT;
     }
-    
 
     for (channel = 0; channel < LinNm_NumberOfLinNmChannels; channel++) {
         ChannelInternal = &LinNm_Internal.LinNmChannels[channel];
@@ -428,7 +441,7 @@ Std_ReturnType LinNm_EnableCommunication(NetworkHandleType NetworkHandle) {
 #endif
 
 /*[SWS_LinNm_00116]*/
-#if(LINNM_USER_DATA_ENABLED == STD_ON && LINNM_PASSIVE_MODE_ENABLED == STD_OFF && LINNM_COM_USER_DATA_SUPPORT == STD_OFF)
+#if(LINNM_USER_DATA_ENABLED == STD_ON && LINNM_PASSIVE_MODE_ENABLED == STD_OFF && LINNM_COM_USER_DATA_SUPPORT == STD_ON)
 /*[SWS_LinNm_00114]*/
 Std_ReturnType LinNm_SetUserData(NetworkHandleType NetworkHandle, const uint8* nmUserDataPtr) {
     uint8_t error_code = LINNM_E_NO_ERROR;
@@ -715,6 +728,6 @@ void LinNm_TxConfirmation(PduIdType TxPduId) {
     }
 }
 
-void LinNm_MainFunction(void){
-	
-}
+//void LinNm_MainFunction(void){
+//
+//}
