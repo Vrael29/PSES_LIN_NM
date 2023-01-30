@@ -94,7 +94,9 @@ void LinNm_Init(const LinNm_ConfigType* ConfigPtr) {
 
 /*[SWS_LinNm_00063]*/
 Std_ReturnType LinNm_PassiveStartUp(NetworkHandleType NetworkHandle) {
-    LinNm_Internal_ChannelType* ChannelInternal = &LinNm_Internal.LinNmChannels[NetworkHandle];
+    NetworkHandleType NetworkHandleBuffer;
+    NetworkHandleBuffer = (NetworkHandle > LinNm_NumberOfLinNmChannels || NetworkHandle < 0) ? 0 : NetworkHandle;
+    LinNm_Internal_ChannelType* ChannelInternal = &LinNm_Internal.LinNmChannels[NetworkHandleBuffer];
     uint8_t error_code = LINNM_E_NO_ERROR;
     Std_ReturnType status = E_OK;
 
@@ -155,7 +157,9 @@ Std_ReturnType LinNm_PassiveStartUp(NetworkHandleType NetworkHandle) {
 #if (LINNM_PASSIVE_MODE_ENABLED == STD_OFF)
 /*[SWS_LinNm_00055]*/
 Std_ReturnType LinNm_NetworkRequest(NetworkHandleType NetworkHandle) {	
-    LinNm_Internal_ChannelType* ChannelInternal = &LinNm_Internal.LinNmChannels[NetworkHandle];
+    NetworkHandleType NetworkHandleBuffer;
+    NetworkHandleBuffer = (NetworkHandle > LinNm_NumberOfLinNmChannels || NetworkHandle < 0) ? 0 : NetworkHandle;
+    LinNm_Internal_ChannelType* ChannelInternal = &LinNm_Internal.LinNmChannels[NetworkHandleBuffer];
 	uint8_t error_code = LINNM_E_NO_ERROR;
 	Std_ReturnType status = E_OK;
 
@@ -210,7 +214,9 @@ Std_ReturnType LinNm_NetworkRequest(NetworkHandleType NetworkHandle) {
 #if (LINNM_PASSIVE_MODE_ENABLED == STD_OFF)
 /*[SWS_LinNm_00056]*/
 Std_ReturnType LinNm_NetworkRelease(NetworkHandleType NetworkHandle) {
-    LinNm_Internal_ChannelType* ChannelInternal = &LinNm_Internal.LinNmChannels[NetworkHandle];
+    NetworkHandleType NetworkHandleBuffer;
+    NetworkHandleBuffer = (NetworkHandle > LinNm_NumberOfLinNmChannels || NetworkHandle < 0) ? 0 : NetworkHandle;
+    LinNm_Internal_ChannelType* ChannelInternal = &LinNm_Internal.LinNmChannels[NetworkHandleBuffer];
 	uint8_t error_code = 0;
 	Std_ReturnType status = E_OK;
 
